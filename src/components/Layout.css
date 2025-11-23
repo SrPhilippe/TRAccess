@@ -1,0 +1,118 @@
+.layout-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: var(--glass-border);
+    color: var(--text-primary);
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+@media (max-width: 480px) {
+    .layout-container {
+        padding: 1rem;
+        max-width: 100%;
+    }
+
+    .theme-toggle {
+        top: 1rem;
+        right: 1rem;
+    }
+}
+
+/* Add a subtle background glow */
+.layout-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.tabs {
+    display: flex;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 6px;
+    margin-bottom: 24px;
+    border: var(--glass-border);
+}
+
+.tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab.active {
+    background: var(--accent-blue);
+    color: #0f172a;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+}
+
+.content-area {
+    padding: 20px 0;
+    min-height: 320px;
+    width: 100%;
+    max-width: 450px;
+    /* Standardize width based on largest card */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    /* Removed card styling to avoid double card effect */
+}
+
+@media (max-width: 480px) {
+    .content-area {
+        padding: 24px;
+        min-height: 280px;
+    }
+
+    .tab {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
