@@ -1,9 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './NewPass.css';
 
 const NewPass = () => {
   const [hexInputs, setHexInputs] = useState(Array(10).fill(''));
   const [password, setPassword] = useState(null);
+  const [date, setDate] = useState({ day: '', month: '' });
+
+  // Initialize with current date on mount
+  useEffect(() => {
+    const now = new Date();
+    setDate({ 
+      day: now.getDate(), 
+      month: now.getMonth() + 1 
+    });
+  }, []);
+
+  // Auto-generate password when inputs change
+  useEffect(() => {
+    // Check if all hex inputs are filled (length 2)
+    const allHexFilled = hexInputs.every(input => input.length === 2);
+    const dateValid = date.day && date.month;
+
+    if (allHexFilled && dateValid) {
+      const hexString = hexInputs.join('-');
+      const result = calculateTriaxxPassword(hexString, parseInt(date.day), parseInt(date.month));
+      
+      if (!result.error) {
+        setPassword(result.Senha);
+      } else {
+        setPassword(null);
+      }
+    } else {
+      setPassword(null);
+    }
+  }, [hexInputs, date]);
+
+  const handleDateChange = (field, value) => {
+    if (value.length > 2) return;
+
+    const numVal = parseInt(value);
+    if (!isNaN(numVal)) {
+      if (field === 'day' && (numVal < 1 || numVal > 31)) return;
+      if (field === 'month' && (numVal < 1 || numVal > 12)) return;
+      setDate(prev => ({ ...prev, [field]: numVal }));
+    } else if (value === '') {
+      setDate(prev => ({ ...prev, [field]: '' }));
+    }
+  };
 
   const handleInputChange = (index, value) => {
     // Allow only hex characters
@@ -118,32 +161,35 @@ const NewPass = () => {
     }
   };
 
-  const generatePassword = () => {
-    // Validate inputs
-    if (hexInputs.some(input => input.length !== 2)) {
-      alert('Please fill all 10 bytes with 2-digit hex values.');
-      return;
-    }
-
-    const today = new Date();
-    const day = today.getDate();
-    const month = today.getMonth() + 1; // 0-indexed in JS
-
-    const hexString = hexInputs.join('-');
-    
-    const result = calculateTriaxxPassword(hexString, day, month);
-
-    if (result.error) {
-      alert(`Error: ${result.error}`);
-    } else {
-      setPassword(result.Senha);
-    }
-  };
-
   return (
-    <div className="newpass-container">
+    <div className="newpass-container glass-panel">
       <h2 className="newpass-title">Gerador de Senha</h2>
       
+      <div className="date-display">
+        <div className="date-item">
+          <label className="date-label">Dia</label>
+          <input 
+            type="number" 
+            className="date-input"
+            value={date.day}
+            onChange={(e) => handleDateChange('day', e.target.value)}
+            min="1"
+            max="31"
+          />
+        </div>
+        <div className="date-item">
+          <label className="date-label">Mês</label>
+          <input 
+            type="number" 
+            className="date-input"
+            value={date.month}
+            onChange={(e) => handleDateChange('month', e.target.value)}
+            min="1"
+            max="12"
+          />
+        </div>
+      </div>
+
       <div className="hex-input-grid" onPaste={handlePaste}>
         {hexInputs.map((value, index) => (
           <div key={index} className="hex-input-wrapper">
@@ -156,21 +202,14 @@ const NewPass = () => {
               placeholder="00"
               maxLength={2}
             />
-            {/* Add separator visual if needed, or rely on grid gap */}
           </div>
         ))}
       </div>
 
-      <button className="generate-btn" onClick={generatePassword}>
-        Gerar Senha
-      </button>
-
-      {password !== null && (
-        <div className="result-display">
-          <span>Senha:</span>
-          <span className="result-value">{password}</span>
-        </div>
-      )}
+      <div className="result-display">
+        <span>Senha:</span>
+        <span className="result-value">{password !== null ? password : '. . . . .'}</span>
+      </div>
     </div>
   );
 };

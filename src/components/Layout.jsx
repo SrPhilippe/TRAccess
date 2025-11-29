@@ -6,7 +6,7 @@ import { Sun, Moon } from 'lucide-react'; // Assuming lucide-react for icons
 import './Layout.css';
 
 const Layout = () => {
-  const [activeTab, setActiveTab] = useState('TMBR');
+  const [activeTab, setActiveTab] = useState('Senha');
   const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
@@ -16,10 +16,12 @@ const Layout = () => {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
       document.body.setAttribute('data-theme', savedTheme);
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', savedTheme === 'dark' ? '#0f172a' : '#f8fafc');
     } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
       setTheme('light');
       document.documentElement.setAttribute('data-theme', 'light');
       document.body.setAttribute('data-theme', 'light');
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f8fafc');
     }
   }, []);
 
@@ -29,6 +31,7 @@ const Layout = () => {
     localStorage.setItem('theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
     document.body.setAttribute('data-theme', newTheme);
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', newTheme === 'dark' ? '#0f172a' : '#f8fafc');
   };
 
   return (
@@ -39,10 +42,10 @@ const Layout = () => {
 
       <div className="tabs">
         <button 
-          className={`tab ${activeTab === 'TMBR' ? 'active' : ''}`}
-          onClick={() => setActiveTab('TMBR')}
+          className={`tab ${activeTab === 'Senha' ? 'active' : ''}`}
+          onClick={() => setActiveTab('Senha')}
         >
-          TMBR
+          Senha
         </button>
         <button 
           className={`tab ${activeTab === 'Periódica' ? 'active' : ''}`}
@@ -59,7 +62,7 @@ const Layout = () => {
       </div>
       
       <div className="content-area">
-        {activeTab === 'TMBR' && <DailyPassword />}
+        {activeTab === 'Senha' && <DailyPassword />}
         {activeTab === 'Periódica' && <RemoveAlarm />}
         {activeTab === 'NewPass' && <NewPass />}
       </div>

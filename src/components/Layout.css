@@ -1,6 +1,7 @@
 .layout-container {
     width: 100%;
     max-width: 500px;
+    margin: 0 auto;
     padding: 1.5rem;
     position: relative;
     z-index: 1;
@@ -28,31 +29,6 @@
 .theme-toggle:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: scale(1.1);
-}
-
-@media (max-width: 480px) {
-    .layout-container {
-        padding: 1rem;
-        max-width: 100%;
-    }
-
-    .theme-toggle {
-        top: 1rem;
-        right: 1rem;
-    }
-}
-
-/* Add a subtle background glow */
-.layout-container::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
-    z-index: -1;
-    pointer-events: none;
 }
 
 .tabs {
@@ -94,7 +70,6 @@
     min-height: 320px;
     width: 100%;
     max-width: 450px;
-    /* Standardize width based on largest card */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -102,17 +77,27 @@
     justify-content: center;
     transition: all 0.3s ease;
     position: relative;
-    /* Removed card styling to avoid double card effect */
 }
 
 @media (max-width: 480px) {
-    .content-area {
-        padding: 24px;
-        min-height: 280px;
+    .layout-container {
+        padding: 1rem;
+        max-width: 100%;
+    }
+
+    .theme-toggle {
+        padding: 6px;
+        margin-bottom: 24px;
+        border: var(--glass-border);
     }
 
     .tab {
         padding: 10px;
         font-size: 0.9rem;
+    }
+
+    .content-area {
+        padding: 24px;
+        min-height: 280px;
     }
 }

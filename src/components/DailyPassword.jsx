@@ -27,8 +27,12 @@ const DailyPassword = () => {
   }, [date]);
 
   const handleDateChange = (field, value) => {
+    if (value.length > 2) return;
+
     const numVal = parseInt(value);
     if (!isNaN(numVal)) {
+      if (field === 'day' && (numVal < 1 || numVal > 31)) return;
+      if (field === 'month' && (numVal < 1 || numVal > 12)) return;
       setDate(prev => ({ ...prev, [field]: numVal }));
     } else if (value === '') {
       setDate(prev => ({ ...prev, [field]: '' }));
