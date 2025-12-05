@@ -80,84 +80,71 @@ const NewPass = () => {
     setHexInputs(newInputs);
   };
 
-  // Helper function to get the nth bit
-  const getBit = (val, n) => {
-    return (val >> n) & 1;
+  // Função auxiliar para pegar bits individuais
+  const getBit = (val, n) => (val >> n) & 1;
+
+  // FÓRMULA UNIVERSAL V3.0 (Recalibrada para B0110-140P e demais modelos)
+  const calculateF1F2 = (macBytes) => {
+    const [b5, b6, b7, b8, b9] = macBytes;
+    let F1 = 0;
+    let F2 = 0;
+
+    // Cálculo BIT a BIT de F1
+    if ((getBit(b5, 1) ^ getBit(b5, 3) ^ getBit(b5, 5) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b7, 1)) === 1) F1 |= (1 << 0);
+    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 3) ^ getBit(b5, 6) ^ getBit(b5, 7) ^ getBit(b6, 2) ^ getBit(b6, 3) ^ getBit(b7, 0) ^ getBit(b7, 1)) === 1) F1 |= (1 << 1);
+    if ((getBit(b5, 2) ^ getBit(b5, 3) ^ getBit(b5, 7) ^ getBit(b6, 0) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F1 |= (1 << 2);
+    if ((getBit(b5, 0) ^ getBit(b5, 2) ^ getBit(b5, 3) ^ getBit(b5, 4) ^ getBit(b6, 2) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F1 |= (1 << 3);
+    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 4) ^ getBit(b5, 6) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b7, 0)) === 1) F1 |= (1 << 4);
+    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b6, 1) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b8, 1)) === 1) F1 |= (1 << 5);
+    if ((getBit(b5, 0) ^ getBit(b5, 3) ^ getBit(b5, 4) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 2) ^ getBit(b6, 6) ^ getBit(b7, 1)) === 1) F1 |= (1 << 6);
+    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F1 |= (1 << 7);
+
+    // Cálculo BIT a BIT de F2
+    if ((getBit(b5, 2) ^ getBit(b5, 4) ^ getBit(b5, 7) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 0);
+    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 2) ^ getBit(b6, 3) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 1);
+    if ((getBit(b5, 1) ^ getBit(b5, 3) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b8, 1)) === 1) F2 |= (1 << 2);
+    if ((getBit(b5, 0) ^ getBit(b5, 3) ^ getBit(b6, 1) ^ getBit(b6, 2) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 3);
+    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b8, 1)) === 1) F2 |= (1 << 4);
+    if ((getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 4) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 5);
+    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 3) ^ getBit(b5, 4) ^ getBit(b5, 7) ^ getBit(b6, 1) ^ getBit(b6, 3) ^ getBit(b6, 6)) === 1) F2 |= (1 << 6);
+    if ((getBit(b5, 0) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b5, 7) ^ getBit(b7, 0) ^ getBit(b7, 1)) === 1) F2 |= (1 << 7);
+
+    return { F1, F2 };
   };
 
-  const calculateTriaxxPassword = (hexCodeStr, day, month) => {
+  const calculateTriaxxPassword = (hexString, day, month) => {
     try {
-      // 1. Parse Hex Code
-      const parts = hexCodeStr.split('-').map(x => parseInt(x, 16));
+      // 1. Parse do Hex Input
+      const parts = hexString.split('-').map(x => parseInt(x, 16));
+      if (parts.some(isNaN)) return { error: true };
 
-      // Security check
-      if (parts.length < 9) {
-        return { error: "Código Hex incompleto. O formato deve ter pelo menos 9 bytes separados por traço." };
-      }
+      const b1 = parts[1];
+      const b3 = parts[3];
+      // MAC Address Bytes (5 a 9)
+      const macBytes = parts.slice(5, 10); 
 
-      // Relevant Bytes
-      const b1 = parts[1];   // Challenge Low
-      const b3 = parts[3];   // Challenge High
-      const b5 = parts[5];   // MAC Byte 0
-      const b6 = parts[6];   // MAC Byte 1
-      const b7 = parts[7];   // MAC Byte 2
-      const b8 = parts[8];   // MAC Byte 3
+      // 2. Calcular F1 e F2 com a Fórmula V3.0
+      const { F1, F2 } = calculateF1F2(macBytes);
 
-      // 2. Universal Formula for F1 and F2 (Reverse Engineering GF2)
-      
-      // Calculate F1 bits
-      const f1_bits = new Array(8).fill(0);
-      f1_bits[0] = getBit(b5,1)^getBit(b5,3)^getBit(b5,5)^getBit(b5,6)^getBit(b6,0)^getBit(b6,1)^getBit(b7,0);
-      f1_bits[1] = getBit(b5,0)^getBit(b5,1)^getBit(b5,3)^getBit(b5,7)^getBit(b6,2)^getBit(b6,3);
-      f1_bits[2] = getBit(b5,2)^getBit(b5,3)^getBit(b5,6)^getBit(b5,7)^getBit(b6,0)^getBit(b6,3)^getBit(b6,6)^getBit(b8,1);
-      f1_bits[3] = getBit(b5,0)^getBit(b5,2)^getBit(b5,3)^getBit(b5,4)^getBit(b5,6)^getBit(b6,2)^getBit(b8,1);
-      f1_bits[4] = getBit(b5,0)^getBit(b5,1)^getBit(b5,2)^getBit(b5,4)^getBit(b5,6)^getBit(b6,3)^getBit(b6,6)^getBit(b7,0);
-      f1_bits[5] = getBit(b5,0)^getBit(b5,1)^getBit(b5,2)^getBit(b6,1)^getBit(b6,6)^getBit(b7,0)^getBit(b8,1);
-      f1_bits[6] = getBit(b5,0)^getBit(b5,3)^getBit(b5,4)^getBit(b6,0)^getBit(b6,1)^getBit(b6,2)^getBit(b6,6)^getBit(b7,0);
-      f1_bits[7] = getBit(b5,0)^getBit(b5,1)^getBit(b5,5)^getBit(b6,0)^getBit(b6,1)^getBit(b6,6)^getBit(b8,1);
+      // 3. Triaxx (Fator Temporal)
+      const triaxx = (169 * day) - (13 * month) + 351;
+      const t_high = Math.floor(triaxx / 256);
+      const t_low = triaxx % 256;
 
-      // Reconstruct Byte F1
-      let F1 = 0;
-      for (let i = 0; i < 8; i++) F1 |= (f1_bits[i] << i);
-
-      // Calculate F2 bits
-      const f2_bits = new Array(8).fill(0);
-      f2_bits[0] = getBit(b5,2)^getBit(b5,4)^getBit(b5,6)^getBit(b5,7)^getBit(b6,0)^getBit(b6,1)^getBit(b7,0)^getBit(b8,1);
-      f2_bits[1] = getBit(b5,0)^getBit(b5,1)^getBit(b5,2)^getBit(b5,5)^getBit(b6,0)^getBit(b6,1)^getBit(b6,2)^getBit(b6,3)^getBit(b8,1);
-      f2_bits[2] = getBit(b5,1)^getBit(b5,3)^getBit(b5,5)^getBit(b5,6)^getBit(b6,0)^getBit(b6,3)^getBit(b6,6)^getBit(b8,1);
-      f2_bits[3] = getBit(b5,0)^getBit(b5,3)^getBit(b5,6)^getBit(b6,1)^getBit(b6,2)^getBit(b6,6)^getBit(b8,1);
-      f2_bits[4] = getBit(b5,0)^getBit(b5,1)^getBit(b5,6)^getBit(b6,0)^getBit(b6,3)^getBit(b6,6)^getBit(b8,1);
-      f2_bits[5] = getBit(b5,1)^getBit(b5,2)^getBit(b5,4)^getBit(b6,0)^getBit(b6,1)^getBit(b6,3)^getBit(b6,6)^getBit(b8,1);
-      f2_bits[6] = getBit(b5,0)^getBit(b5,1)^getBit(b5,2)^getBit(b5,3)^getBit(b5,4)^getBit(b5,7)^getBit(b6,1)^getBit(b6,3)^getBit(b6,6);
-      f2_bits[7] = getBit(b5,0)^getBit(b5,5)^getBit(b5,7);
-
-      // Reconstruct Byte F2
-      let F2 = 0;
-      for (let i = 0; i < 8; i++) F2 |= (f2_bits[i] << i);
-
-      // 3. Calculate TRIAXX (Temporal)
-      const triaxx_val = (169 * day) - (13 * month) + 351;
-      const t_high = Math.floor(triaxx_val / 256);
-      const t_low = triaxx_val % 256;
-
-      // 4. Calculate Final Keys (K)
+      // 4. Chaves Dinâmicas
       const k3 = t_high ^ F1;
       const k1 = t_low ^ F2;
 
-      // 5. Decode Password
+      // 5. Senha Final
       const pass_high = b3 ^ k3;
       const pass_low = b1 ^ k1;
+      const finalPassword = (pass_high * 256) + pass_low;
 
-      const final_password = (pass_high * 256) + pass_low;
+      return { Senha: finalPassword, error: false };
 
-      return {
-        F1_Calculado: F1,
-        F2_Calculado: F2,
-        Senha: final_password
-      };
-
-    } catch (error) {
-      return { error: error.message };
+    } catch (e) {
+      console.error("Erro no cálculo:", e);
+      return { error: true };
     }
   };
 
