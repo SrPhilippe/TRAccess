@@ -2,6 +2,8 @@
   --bg-app: #0f172a;
   --bg-card: rgba(30, 41, 59, 0.7);
   --bg-input: rgba(51, 65, 85, 0.5);
+  --bg-tabs: rgba(15, 23, 42, 0.6);
+  --bg-hover: rgba(255, 255, 255, 0.05);
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --accent-green: #4ade80;
@@ -20,6 +22,8 @@
   --bg-app: #f8fafc;
   --bg-card: rgba(255, 255, 255, 0.9);
   --bg-input: rgba(226, 232, 240, 0.8);
+  --bg-tabs: rgba(255, 255, 255, 0.6);
+  --bg-hover: rgba(0, 0, 0, 0.05);
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --accent-green: #16a34a;
