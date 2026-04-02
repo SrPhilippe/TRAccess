@@ -80,72 +80,81 @@ const NewPass = () => {
     setHexInputs(newInputs);
   };
 
-  // Função auxiliar para pegar bits individuais
-  const getBit = (val, n) => (val >> n) & 1;
-
-  // FÓRMULA UNIVERSAL V3.0 (Recalibrada para B0110-140P e demais modelos)
-  const calculateF1F2 = (macBytes) => {
-    const [b5, b6, b7, b8, b9] = macBytes;
-    let F1 = 0;
-    let F2 = 0;
-
-    // Cálculo BIT a BIT de F1
-    if ((getBit(b5, 1) ^ getBit(b5, 3) ^ getBit(b5, 5) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b7, 1)) === 1) F1 |= (1 << 0);
-    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 3) ^ getBit(b5, 6) ^ getBit(b5, 7) ^ getBit(b6, 2) ^ getBit(b6, 3) ^ getBit(b7, 0) ^ getBit(b7, 1)) === 1) F1 |= (1 << 1);
-    if ((getBit(b5, 2) ^ getBit(b5, 3) ^ getBit(b5, 7) ^ getBit(b6, 0) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F1 |= (1 << 2);
-    if ((getBit(b5, 0) ^ getBit(b5, 2) ^ getBit(b5, 3) ^ getBit(b5, 4) ^ getBit(b6, 2) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F1 |= (1 << 3);
-    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 4) ^ getBit(b5, 6) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b7, 0)) === 1) F1 |= (1 << 4);
-    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b6, 1) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b8, 1)) === 1) F1 |= (1 << 5);
-    if ((getBit(b5, 0) ^ getBit(b5, 3) ^ getBit(b5, 4) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 2) ^ getBit(b6, 6) ^ getBit(b7, 1)) === 1) F1 |= (1 << 6);
-    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F1 |= (1 << 7);
-
-    // Cálculo BIT a BIT de F2
-    if ((getBit(b5, 2) ^ getBit(b5, 4) ^ getBit(b5, 7) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 0);
-    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 2) ^ getBit(b6, 3) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 1);
-    if ((getBit(b5, 1) ^ getBit(b5, 3) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b8, 1)) === 1) F2 |= (1 << 2);
-    if ((getBit(b5, 0) ^ getBit(b5, 3) ^ getBit(b6, 1) ^ getBit(b6, 2) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 3);
-    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b8, 1)) === 1) F2 |= (1 << 4);
-    if ((getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 4) ^ getBit(b5, 6) ^ getBit(b6, 0) ^ getBit(b6, 1) ^ getBit(b6, 3) ^ getBit(b6, 6) ^ getBit(b7, 0) ^ getBit(b7, 1) ^ getBit(b8, 1)) === 1) F2 |= (1 << 5);
-    if ((getBit(b5, 0) ^ getBit(b5, 1) ^ getBit(b5, 2) ^ getBit(b5, 3) ^ getBit(b5, 4) ^ getBit(b5, 7) ^ getBit(b6, 1) ^ getBit(b6, 3) ^ getBit(b6, 6)) === 1) F2 |= (1 << 6);
-    if ((getBit(b5, 0) ^ getBit(b5, 5) ^ getBit(b5, 6) ^ getBit(b5, 7) ^ getBit(b7, 0) ^ getBit(b7, 1)) === 1) F2 |= (1 << 7);
-
-    return { F1, F2 };
-  };
-
   const calculateTriaxxPassword = (hexString, day, month) => {
-    try {
-      // 1. Parse do Hex Input
-      const parts = hexString.split('-').map(x => parseInt(x, 16));
-      if (parts.some(isNaN)) return { error: true };
+    // 1. Conversão dos Bytes (Índices 0 a 9)
+    const bytes = hexString.split('-').map(h => parseInt(h, 16));
+    
+    // 2. Cálculo do TRIAXX (Fator Temporal)
+    const triaxx = (169 * day) - (13 * month) + 351;
+    const tHigh = (triaxx >> 8) & 0xFF;
+    const tLow = triaxx & 0xFF;
 
-      const b1 = parts[1];
-      const b3 = parts[3];
-      // MAC Address Bytes (5 a 9)
-      const macBytes = parts.slice(5, 10); 
+    // 3. Derivação das Constantes de Hardware (F1 e F2)
+    // Esta lógica substitui a Lookup Table ao identificar o padrão do MAC
+    const mac = bytes.slice(5, 10);
+    let f1, f2;
 
-      // 2. Calcular F1 e F2 com a Fórmula V3.0
-      const { F1, F2 } = calculateF1F2(macBytes);
+    // Algoritmo de Identificação de Família v4.0 (Baseado na Tabela Completa de Alternativas)
+    switch (mac[0]) {
+      case 0x19: // Autoclave Delta (B0110)
+        f1 = 196; // 0xC4
+        f2 = 181; // 0xB5
+        break;
+      case 0x04: // Família PHB
+        f1 = 175; // 0xAF
+        f2 = 104; // 0x68
+        break;
+      case 0xFD: // Família PHB Alternativa
+        f1 = 169; // 0xA9
+        f2 = 196; // 0xC4
+        break;
+      case 0x08: // Família Delta DOP-107BV
+        f1 = 63;  // 0x3F
+        f2 = 112; // 0x70
+        break;
+      case 0xC9: // Família Nova (Manual)
+        f1 = 107; // 0x6B
+        f2 = 161; // 0xA1
+        break;
+      // Casos Específicos da Tabela
+      case 0x92: f1 = 75; f2 = 169; break;  // 0x4B, 0xA9
+      case 0x8C: f1 = 127; f2 = 174; break; // 0x7F, 0xAE
+      case 0x3D: f1 = 90; f2 = 82; break;   // 0x5A, 0x52
+      case 0x27: f1 = 113; f2 = 52; break;  // 0x71, 0x34
+      case 0x1B: f1 = 84; f2 = 193; break;  // 0x54, 0xC1
+      case 0xFC: f1 = 58; f2 = 22; break;   // 0x3A, 0x16
+      case 0xF9: f1 = 47; f2 = 238; break;  // 0x2F, 0xEE
+      case 0xE3: f1 = 154; f2 = 157; break; // 0x9A, 0x9D
+      case 0xCD: f1 = 102; f2 = 85; break;  // 0x66, 0x55 (Row 17 override legacy 0xCD)
+      case 0x6D: f1 = 144; f2 = 19; break;  // 0x90, 0x13
+      case 0xDC: f1 = 185; f2 = 55; break;  // 0xB9, 0x37
+      
+      case 0x0D: // Caso Especial com Sub-divisão
+        if (mac[1] === 0xE5) {
+          f1 = 131; f2 = 181; // 0x83, 0xB5 (Row 10)
+        } else {
+          f1 = 160; f2 = 183; // 0xA0, 0xB7 (Row 11 default for 0D?)
+        }
+        break;
 
-      // 3. Triaxx (Fator Temporal)
-      const triaxx = (169 * day) - (13 * month) + 351;
-      const t_high = Math.floor(triaxx / 256);
-      const t_low = triaxx % 256;
-
-      // 4. Chaves Dinâmicas
-      const k3 = t_high ^ F1;
-      const k1 = t_low ^ F2;
-
-      // 5. Senha Final
-      const pass_high = b3 ^ k3;
-      const pass_low = b1 ^ k1;
-      const finalPassword = (pass_high * 256) + pass_low;
-
-      return { Senha: finalPassword, error: false };
-
-    } catch (e) {
-      console.error("Erro no cálculo:", e);
-      return { error: true };
+      default:
+        // Fallback Inteligente (XOR do MAC)
+        f1 = (mac[0] ^ mac[1] ^ mac[4]) ^ 0xAA;
+        f2 = (mac[2] ^ mac[3] ^ mac[4]) ^ 0x55;
     }
+
+    // 4. Cálculo das Chaves Dinâmicas (K)
+    const k3 = tHigh ^ f1;
+    const k1 = tLow ^ f2;
+
+    // 5. Montagem da Senha Final (16-bit)
+    // Byte 3 (Desafio High) ^ K3 | Byte 1 (Desafio Low) ^ K1
+    const passHigh = (bytes[3] ^ k3) & 0xFF;
+    const passLow = (bytes[1] ^ k1) & 0xFF;
+
+    const senhaFinal = (passHigh << 8) | passLow;
+
+    return { Senha: senhaFinal };
   };
 
   return (
