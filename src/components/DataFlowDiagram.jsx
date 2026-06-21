@@ -1,0 +1,129 @@
+import './DataFlowDiagram.css'
+
+const DataFlowDiagram = ({ hexInputs, resultData }) => {
+  const bytes = hexInputs || Array(10).fill('')
+
+  const { k1, k3, low, high, Senha } = resultData || {}
+
+  // Format hex helper
+  const hex = val =>
+    val !== undefined && val !== null && !isNaN(val) ? `0x${val.toString(16).toUpperCase().padStart(2, '0')}` : '??'
+  const byteStr = val => (val && val.trim() !== '' ? val.toUpperCase().padStart(2, '0') : '00')
+
+  const drawCurve = (x1, y1, x2, y2, color, dashed = false) => {
+    const cx1 = x1 + (x2 - x1) / 2
+    const cy1 = y1
+    const cx2 = x1 + (x2 - x1) / 2
+    const cy2 = y2
+    return (
+      <path
+        d={`M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`}
+        fill='none'
+        stroke={color}
+        strokeWidth='2'
+        strokeDasharray={dashed ? '5,5' : 'none'}
+      />
+    )
+  }
+
+  const drawDot = (x, y, color) => <circle cx={x} cy={y} r='4' fill={color} />
+
+  return (
+    <div className='dfd-container glass-panel'>
+      <h3 className='dfd-title'>Diagrama de Fluxo de Dados</h3>
+      <div className='dfd-svg-wrapper'>
+        <svg viewBox='0 0 850 500' className='dfd-svg'>
+          {/* Paths */}
+          {/* Input to K1 */}
+          {drawCurve(120, 280, 220, 220, '#34d399', true)} {/* b5 to K1 */}
+          {drawCurve(120, 400, 220, 220, '#34d399', true)} {/* b8 to K1 */}
+          {/* Input to K3 */}
+          {drawCurve(120, 320, 220, 380, '#34d399', true)} {/* b6 to K3 */}
+          {drawCurve(120, 360, 220, 380, '#34d399', true)} {/* b7 to K3 */}
+          {drawCurve(120, 440, 220, 380, '#34d399', true)} {/* b9 to K3 */}
+          {/* Input to XOR */}
+          {drawCurve(120, 120, 450, 140, '#fbbf24')} {/* b1 to Low */}
+          {drawCurve(120, 200, 450, 300, '#fbbf24')} {/* b3 to High */}
+          {/* K1, K3 to XOR */}
+          {drawCurve(380, 220, 450, 140, '#34d399')}
+          {drawCurve(380, 380, 450, 300, '#34d399')}
+          {/* XOR to Combine */}
+          {drawCurve(610, 140, 680, 220, '#fbbf24')}
+          {drawCurve(610, 300, 680, 220, '#fbbf24')}
+          {/* Dots */}
+          {drawDot(120, 120, '#fbbf24')}
+          {drawDot(120, 200, '#fbbf24')}
+          {drawDot(120, 280, '#34d399')}
+          {drawDot(120, 320, '#34d399')}
+          {drawDot(120, 360, '#34d399')}
+          {drawDot(120, 400, '#34d399')}
+          {drawDot(120, 440, '#34d399')}
+          {drawDot(450, 140, '#fbbf24')}
+          {drawDot(450, 300, '#fbbf24')}
+          {drawDot(680, 220, '#fbbf24')}
+          {/* Foreign Objects for Nodes */}
+          {/* Inputs Column */}
+          {Array.from({ length: 10 }).map((_, i) => (
+            <foreignObject x='0' y={40 * i + 64} width='120' height='32' key={i}>
+              <div
+                className={`dfd-node input-node ${[1, 3].includes(i) ? 'challenge' : ''} ${[5, 6, 7, 8, 9].includes(i) ? 'key' : ''}`}
+              >
+                <span className='byte-index'>{i}</span>
+                <span className='byte-val'>{byteStr(bytes[i])}</span>
+              </div>
+            </foreignObject>
+          ))}
+          {/* Key Derivation Column */}
+          <foreignObject x='220' y='180' width='160' height='80'>
+            <div className='dfd-node key-node'>
+              <span className='formula'>K1 = b5 ⊕ b8 ⊕ 0x23</span>
+              <span className='result'>{hex(k1)}</span>
+            </div>
+          </foreignObject>
+          <foreignObject x='220' y='340' width='160' height='80'>
+            <div className='dfd-node key-node'>
+              <span className='formula'>K3 = b6 ⊕ b7 ⊕ b9 ⊕ 0x18</span>
+              <span className='result'>{hex(k3)}</span>
+            </div>
+          </foreignObject>
+          {/* XOR Stage Column */}
+          <foreignObject x='450' y='100' width='160' height='80'>
+            <div className='dfd-node xor-node'>
+              <span className='formula'>b1 ⊕ K1</span>
+              <span className='result'>{hex(low)}</span>
+            </div>
+          </foreignObject>
+          <foreignObject x='450' y='260' width='160' height='80'>
+            <div className='dfd-node xor-node'>
+              <span className='formula'>b3 ⊕ K3</span>
+              <span className='result'>{hex(high)}</span>
+            </div>
+          </foreignObject>
+          {/* Combine Column */}
+          <foreignObject x='680' y='170' width='160' height='100'>
+            <div className='dfd-node combine-node'>
+              <span className='formula'>low + 256 × high</span>
+              <span className='result'>{Senha !== undefined && Senha !== null && !isNaN(Senha) ? Senha : '-----'}</span>
+              <span className='label'>SENHA</span>
+            </div>
+          </foreignObject>
+          {/* Column Headers */}
+          <foreignObject x='0' y='20' width='120' height='30'>
+            <div className='dfd-header'>INPUT BYTES</div>
+          </foreignObject>
+          <foreignObject x='220' y='20' width='160' height='30'>
+            <div className='dfd-header'>KEY DERIVATION</div>
+          </foreignObject>
+          <foreignObject x='450' y='20' width='160' height='30'>
+            <div className='dfd-header'>XOR STAGE</div>
+          </foreignObject>
+          <foreignObject x='680' y='20' width='160' height='30'>
+            <div className='dfd-header'>COMBINE</div>
+          </foreignObject>
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+export default DataFlowDiagram

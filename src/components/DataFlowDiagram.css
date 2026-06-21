@@ -1,0 +1,137 @@
+.dfd-container {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 2rem;
+    border-radius: 24px;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.dfd-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.dfd-svg-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.dfd-svg {
+    min-width: 800px;
+    width: 100%;
+    height: auto;
+}
+
+.dfd-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    width: 100%;
+}
+
+.dfd-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.8);
+    color: var(--text-primary);
+    width: 100%;
+    height: 100%;
+    font-family: 'Roboto Mono', monospace;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.input-node {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    background: rgba(30, 41, 59, 0.8);
+    font-size: 0.85rem;
+}
+
+.input-node .byte-index {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+}
+
+.input-node.challenge {
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.input-node.challenge .byte-val {
+    color: #fbbf24;
+}
+
+.input-node.key {
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.input-node.key .byte-val {
+    color: #34d399;
+}
+
+.key-node {
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.key-node .formula {
+    font-size: 0.75rem;
+    color: #34d399;
+    margin-bottom: 0.25rem;
+}
+
+.key-node .result {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #6ee7b7;
+}
+
+.xor-node {
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.xor-node .formula {
+    font-size: 0.8rem;
+    color: #fbbf24;
+    margin-bottom: 0.25rem;
+}
+
+.xor-node .result {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fcd34d;
+}
+
+.combine-node {
+    border-color: rgba(56, 189, 248, 0.4);
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.combine-node .formula {
+    font-size: 0.8rem;
+    color: #38bdf8;
+    margin-bottom: 0.5rem;
+}
+
+.combine-node .result {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #bae6fd;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.combine-node .label {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    letter-spacing: 0.1em;
+}
