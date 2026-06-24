@@ -66,31 +66,32 @@ const NewPass = () => {
 
     if (bytes.length !== 10) return { error: true }
 
-    const b1 = bytes[1]
+    const b0 = bytes[0]
+    const b2 = bytes[2]
     const b3 = bytes[3]
     const b5 = bytes[5]
     const b6 = bytes[6]
-    const b7 = bytes[7]
     const b8 = bytes[8]
     const b9 = bytes[9]
 
     // Cálculo das Chaves Dinâmicas (K)
-    const K1 = b5 ^ b8 ^ 0x23
-    const K3 = b6 ^ b7 ^ b9 ^ 0x18
+    const J1 = b2 ^ b3 ^ b5 ^ 0x4F
+    const J6 = b6 ^ b8 ^ 0x9A
 
     // XOR challenge bytes
-    const low = b1 ^ K1
-    const high = b3 ^ K3
+    const val1 = b0 ^ J1
+    const val2 = b9 ^ J6
 
     // Combine into Senha
-    const senhaFinal = low + 256 * high
+    const combined = (val1 << 8) | val2
+    const senhaFinal = combined.toString().padStart(5, '0')
 
     return { 
       Senha: senhaFinal,
-      k1: K1,
-      k3: K3,
-      low: low,
-      high: high
+      j1: J1,
+      j6: J6,
+      val1: val1,
+      val2: val2
     }
   }
 

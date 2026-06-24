@@ -3,7 +3,7 @@ import './DataFlowDiagram.css'
 const DataFlowDiagram = ({ hexInputs, resultData }) => {
   const bytes = hexInputs || Array(10).fill('')
 
-  const { k1, k3, low, high, Senha } = resultData || {}
+  const { j1, j6, val1, val2, Senha } = resultData || {}
 
   // Format hex helper
   const hex = val =>
@@ -34,30 +34,30 @@ const DataFlowDiagram = ({ hexInputs, resultData }) => {
       <div className='dfd-svg-wrapper'>
         <svg viewBox='0 0 850 500' className='dfd-svg'>
           {/* Paths */}
-          {/* Input to K1 */}
-          {drawCurve(120, 280, 220, 220, '#34d399', true)} {/* b5 to K1 */}
-          {drawCurve(120, 400, 220, 220, '#34d399', true)} {/* b8 to K1 */}
-          {/* Input to K3 */}
-          {drawCurve(120, 320, 220, 380, '#34d399', true)} {/* b6 to K3 */}
-          {drawCurve(120, 360, 220, 380, '#34d399', true)} {/* b7 to K3 */}
-          {drawCurve(120, 440, 220, 380, '#34d399', true)} {/* b9 to K3 */}
+          {/* Input to J1 */}
+          {drawCurve(120, 160, 220, 220, '#34d399', true)} {/* b2 to J1 */}
+          {drawCurve(120, 200, 220, 220, '#34d399', true)} {/* b3 to J1 */}
+          {drawCurve(120, 280, 220, 220, '#34d399', true)} {/* b5 to J1 */}
+          {/* Input to J6 */}
+          {drawCurve(120, 320, 220, 380, '#34d399', true)} {/* b6 to J6 */}
+          {drawCurve(120, 400, 220, 380, '#34d399', true)} {/* b8 to J6 */}
           {/* Input to XOR */}
-          {drawCurve(120, 120, 450, 140, '#fbbf24')} {/* b1 to Low */}
-          {drawCurve(120, 200, 450, 300, '#fbbf24')} {/* b3 to High */}
-          {/* K1, K3 to XOR */}
+          {drawCurve(120, 80, 450, 140, '#fbbf24')} {/* b0 to val1 */}
+          {drawCurve(120, 440, 450, 300, '#fbbf24')} {/* b9 to val2 */}
+          {/* J1, J6 to XOR */}
           {drawCurve(380, 220, 450, 140, '#34d399')}
           {drawCurve(380, 380, 450, 300, '#34d399')}
           {/* XOR to Combine */}
           {drawCurve(610, 140, 680, 220, '#fbbf24')}
           {drawCurve(610, 300, 680, 220, '#fbbf24')}
           {/* Dots */}
-          {drawDot(120, 120, '#fbbf24')}
-          {drawDot(120, 200, '#fbbf24')}
+          {drawDot(120, 80, '#fbbf24')}
+          {drawDot(120, 160, '#34d399')}
+          {drawDot(120, 200, '#34d399')}
           {drawDot(120, 280, '#34d399')}
           {drawDot(120, 320, '#34d399')}
-          {drawDot(120, 360, '#34d399')}
           {drawDot(120, 400, '#34d399')}
-          {drawDot(120, 440, '#34d399')}
+          {drawDot(120, 440, '#fbbf24')}
           {drawDot(450, 140, '#fbbf24')}
           {drawDot(450, 300, '#fbbf24')}
           {drawDot(680, 220, '#fbbf24')}
@@ -66,7 +66,7 @@ const DataFlowDiagram = ({ hexInputs, resultData }) => {
           {Array.from({ length: 10 }).map((_, i) => (
             <foreignObject x='0' y={40 * i + 64} width='120' height='32' key={i}>
               <div
-                className={`dfd-node input-node ${[1, 3].includes(i) ? 'challenge' : ''} ${[5, 6, 7, 8, 9].includes(i) ? 'key' : ''}`}
+                className={`dfd-node input-node ${[0, 9].includes(i) ? 'challenge' : ''} ${[2, 3, 5, 6, 8].includes(i) ? 'key' : ''}`}
               >
                 <span className='byte-index'>{i}</span>
                 <span className='byte-val'>{byteStr(bytes[i])}</span>
@@ -76,33 +76,33 @@ const DataFlowDiagram = ({ hexInputs, resultData }) => {
           {/* Key Derivation Column */}
           <foreignObject x='220' y='180' width='160' height='80'>
             <div className='dfd-node key-node'>
-              <span className='formula'>K1 = b5 ⊕ b8 ⊕ 0x23</span>
-              <span className='result'>{hex(k1)}</span>
+              <span className='formula'>J1 = b2 ⊕ b3 ⊕ b5 ⊕ 0x4F</span>
+              <span className='result'>{hex(j1)}</span>
             </div>
           </foreignObject>
           <foreignObject x='220' y='340' width='160' height='80'>
             <div className='dfd-node key-node'>
-              <span className='formula'>K3 = b6 ⊕ b7 ⊕ b9 ⊕ 0x18</span>
-              <span className='result'>{hex(k3)}</span>
+              <span className='formula'>J6 = b6 ⊕ b8 ⊕ 0x9A</span>
+              <span className='result'>{hex(j6)}</span>
             </div>
           </foreignObject>
           {/* XOR Stage Column */}
           <foreignObject x='450' y='100' width='160' height='80'>
             <div className='dfd-node xor-node'>
-              <span className='formula'>b1 ⊕ K1</span>
-              <span className='result'>{hex(low)}</span>
+              <span className='formula'>b0 ⊕ J1</span>
+              <span className='result'>{hex(val1)}</span>
             </div>
           </foreignObject>
           <foreignObject x='450' y='260' width='160' height='80'>
             <div className='dfd-node xor-node'>
-              <span className='formula'>b3 ⊕ K3</span>
-              <span className='result'>{hex(high)}</span>
+              <span className='formula'>b9 ⊕ J6</span>
+              <span className='result'>{hex(val2)}</span>
             </div>
           </foreignObject>
           {/* Combine Column */}
           <foreignObject x='680' y='170' width='160' height='100'>
             <div className='dfd-node combine-node'>
-              <span className='formula'>low + 256 × high</span>
+              <span className='formula'>(val1 ≪ 8) | val2</span>
               <span className='result'>{Senha !== undefined && Senha !== null && !isNaN(Senha) ? Senha : '-----'}</span>
               <span className='label'>SENHA</span>
             </div>
